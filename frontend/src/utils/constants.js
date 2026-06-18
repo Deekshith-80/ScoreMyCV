@@ -1,4 +1,5 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://resumepilot-backend-api.vercel.app/api';
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://resumepilot-backend-api.vercel.app/api";
 
 export const THEME_OPTIONS = [
   { label: 'Light', value: 'light' },
@@ -12,4 +13,3 @@ export const DASHBOARD_QUICK_ACTIONS = [
   { label: 'Match Jobs', to: '/job-matcher' },
   { label: 'Edit Profile', to: '/profile' }
 ];
-
