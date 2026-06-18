@@ -17,3 +17,5 @@ __pycache__/
 # Local uploads
 backend/src/uploads/*
 !backend/src/uploads/.gitkeep
+.vercel
+.env*
