@@ -15,10 +15,14 @@ const profileRoutes = require("./routes/profileRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://resumepilot-ai-frontend.vercel.app",
+];
 
 app.use(
   cors({
-    origin: env.frontendOrigins,
+    origin: allowedOrigins,
     credentials: true,
   }),
 );

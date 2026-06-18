@@ -27,6 +27,14 @@ except Exception:  # pragma: no cover - optional dependency
 
 APP_NAME = "ATS Service"
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "*")
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:5173,https://resumepilot-ai-frontend.vercel.app,http://localhost:5000,https://resumepilot-backend-api.vercel.app",
+    ).split(",")
+    if origin.strip()
+]
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
 ATS_EXPORT_MAX_LINES = int(os.getenv("ATS_EXPORT_MAX_LINES", "55"))
@@ -40,7 +48,7 @@ logger = logging.getLogger("ats-service")
 app = FastAPI(title=APP_NAME, version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_ORIGIN] if FRONTEND_ORIGIN != "*" else ["*"],
+    allow_origins=ALLOWED_ORIGINS if FRONTEND_ORIGIN == "*" else [FRONTEND_ORIGIN, *ALLOWED_ORIGINS],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -13,9 +13,11 @@ __pycache__/
 # Environment secrets
 .env
 .env.local
+.env.production
+.env.Production
+.env.*
 
 # Local uploads
 backend/src/uploads/*
 !backend/src/uploads/.gitkeep
 .vercel
-.env*
