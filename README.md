@@ -1,28 +1,36 @@
-# ResumePilot AI
+# ScoreMyCV
 
-An AI-powered resume analysis platform that helps users analyze, optimize, and tailor resumes for specific jobs. The app combines a React frontend, a Node/Express backend, and a FastAPI-based ATS engine for resume scoring, job matching, cover letters, and export generation.
+ScoreMyCV is an ATS-focused resume analysis and optimization platform. It combines a React frontend, a Node.js/Express API gateway, and a Python FastAPI service that handles parsing, scoring, job matching, cover letter generation, and document export.
 
 ## What It Does
 
-- Parse uploaded resumes in PDF or DOCX format
-- Generate ATS-style resume scores and feedback
-- Highlight missing keywords, weak sections, and improvement areas
+- Upload resumes in PDF or DOCX format
+- Extract and analyze resume content
+- Generate ATS-style scores and feedback
+- Highlight missing keywords and weak sections
 - Match resumes against job descriptions
-- Generate cover letters
-- Export optimized resume content to PDF or DOCX
+- Generate tailored cover letters
+- Export optimized content as PDF or DOCX
+
+## Tech Stack
+
+- Frontend: React, Vite, Tailwind CSS
+- Backend: Node.js, Express, JWT, Multer
+- ATS Engine: Python 3.10+, FastAPI, spaCy
+- Database: MongoDB with Mongoose
 
 ## Project Structure
 
-- `frontend/` - React application
-- `backend/` - Node/Express API
-- `backend/python-service/` - FastAPI ATS engine used by the backend
+- `frontend/` - React single-page app
+- `backend/` - Node.js API gateway
+- `backend/python-service/` - FastAPI ATS/NLP service
 
 ## Prerequisites
 
 - Node.js 18+
 - npm
 - Python 3.10+
-- A working MongoDB instance
+- MongoDB
 
 ## Setup
 
@@ -40,7 +48,7 @@ cd backend/python-service
 python3 -m pip install -r requirements.txt
 ```
 
-If spaCy asks for the English language model, install it once:
+If spaCy asks for the English language model:
 
 ```bash
 python3 -m spacy download en_core_web_sm
@@ -80,36 +88,63 @@ npm run dev
 
 ## Environment Variables
 
-The backend reads these common variables from `backend/.env` or the shell:
+The Node backend reads variables from `backend/.env` or the shell.
 
-- `PORT` - Node backend port, default `5000`
-- `MONGODB_URI` - MongoDB connection string
-- `JWT_SECRET` - JWT signing secret
-- `FRONTEND_ORIGIN` - Allowed frontend origin, default `http://localhost:5173`
-- `BACKEND_URL` - Public backend URL
-- `PYTHON_SERVICE_URL` - Python ATS service URL, default `http://127.0.0.1:8000`
-- `PYTHON_SERVICE_HOST` - Alternative host for the Python service
-- `PYTHON_SERVICE_PORT` - Alternative port for the Python service
+### Node backend
 
-For the Python service:
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `5000` | Node server port |
+| `MONGODB_URI` | `mongodb://127.0.0.1:27017/ai_resume_analyzer` | MongoDB connection string |
+| `JWT_SECRET` | `development-secret-change-me` | JWT signing secret |
+| `JWT_EXPIRES_IN` | `7d` | JWT expiration time |
+| `BACKEND_URL` | `http://localhost:5000` | Public backend URL |
+| `PYTHON_SERVICE_URL` | `http://127.0.0.1:8000` | Python ATS service URL |
+| `MAX_FILE_SIZE_MB` | `10` | Resume upload size limit |
+| `NODE_ENV` | `development` | Runtime mode |
 
-- `PORT` - FastAPI port, default `8000`
-- `FRONTEND_ORIGIN` - CORS origin for the frontend
-- `OPENAI_API_KEY` - Optional, if you use model-backed generation paths
-- `OPENAI_MODEL` - Optional model name, default `gpt-4.1-mini`
-- `LOG_LEVEL` - Logging level
+### Python service
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `8000` | FastAPI port |
+| `FRONTEND_ORIGIN` | `*` | Primary frontend origin for CORS |
+| `ALLOWED_ORIGINS` | `http://localhost:5173,https://resumepilot-ai-frontend.vercel.app,http://localhost:5000,https://resumepilot-backend-api.vercel.app` | Additional allowed CORS origins |
+| `OPENAI_API_KEY` | unset | Optional model-backed generation |
+| `OPENAI_MODEL` | `gpt-4.1-mini` | Optional OpenAI model name |
+| `LOG_LEVEL` | `INFO` | Service log level |
+| `ATS_EXPORT_MAX_LINES` | `55` | Export formatting limit |
 
 ## API Overview
 
 ### Node backend
 
 - `GET /health`
-- `POST /api/auth/...`
-- `POST /api/resume/...`
-- `POST /api/ats/...`
-- `POST /api/jobs/...`
-- `POST /api/profile/...`
-- `POST /api/settings/...`
+- `GET /`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `POST /api/auth/logout`
+- `DELETE /api/auth/delete-account`
+- `POST /api/resume/upload`
+- `GET /api/resume/history`
+- `GET /api/resume/:id`
+- `DELETE /api/resume/:id`
+- `POST /api/ats/analyze`
+- `POST /api/ats/optimize`
+- `POST /api/ats/generate-cover-letter`
+- `POST /api/ats/export`
+- `GET /api/jobs`
+- `GET /api/jobs/matches`
+- `GET /api/jobs/:id`
+- `POST /api/jobs/apply`
+- `GET /api/profile`
+- `PUT /api/profile`
+- `GET /api/profile/stats`
+- `PUT /api/settings/theme`
+- `PUT /api/settings/password`
+- `POST /api/settings/logout`
+- `DELETE /api/settings/delete-account`
 
 ### Python ATS service
 
@@ -122,10 +157,6 @@ For the Python service:
 
 ## Notes
 
-- The Node backend talks to the Python service over HTTP, so both processes must be running for full ATS features.
-- Uploads are stored under `backend/src/uploads/`.
-- The backend already includes fallback logic for `localhost` and `127.0.0.1` when contacting the Python service.
-
-## Suggested Project Name
-
-ResumePilot AI
+- The Node backend talks to the Python service over HTTP, so both services must be running for full ATS functionality.
+- Resume uploads are stored under `backend/src/uploads/`.
+- The backend checks the Python service on startup and logs a warning if it is unavailable.
