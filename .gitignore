@@ -21,3 +21,11 @@ __pycache__/
 backend/src/uploads/*
 !backend/src/uploads/.gitkeep
 .vercel
+
+# Exclude heavy folders from AI indexing
+.venv/
+venv/
+node_modules/
+.vercel/
+.agents/
+.codex/
